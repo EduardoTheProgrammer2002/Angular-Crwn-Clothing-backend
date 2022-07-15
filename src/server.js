@@ -1,6 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const authRouter = require('./routes/authRouter');
+
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 
 const app = express();
 
@@ -9,6 +15,9 @@ const corOptions = {credential: true, origin: process.env.url || "*"};
 app.use(cors(corOptions));
 app.use(cookieParser());
 app.use(express.json());
+
+//routes
+app.use('/api/', authRouter);
 
 
 app.listen(5000, () => {
