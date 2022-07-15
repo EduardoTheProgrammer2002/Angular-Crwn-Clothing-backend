@@ -60,9 +60,9 @@ const signUserIn = async (req, res) => {
 
         //user passed all the validations, it's time to generate tokens
         const tokens = generateTokens(user);
-        res.cookie('refresh_token', tokens.refreshToken, {httpOnly: true, sameSite: 'none'});
 
-        req.user = user;
+        //store the refresh_token in the cookies to usit to refresh the tokens.
+        res.cookie('refresh_token', tokens.refreshToken, {httpOnly: true, sameSite: 'none'});
         return res.status(200).json({ok: true, tokens: tokens});
 
     } catch (error) {
