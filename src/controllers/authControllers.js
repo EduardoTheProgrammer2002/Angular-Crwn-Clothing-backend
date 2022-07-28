@@ -74,20 +74,15 @@ const signUserIn = async (req, res) => {
 };
 
 const refreshAuth = (req, res) => {
-    const refreshToken = req.cookies['refresh_token'];
-    
-    return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) {
-            return res.status(200).json({ok: false, err: err.message});
-        }
-        
-        req.user = user;
-        const tokens = generateTokens(user)
-        res.cookie('refresh_token', tokens.refreshToken, {httpOnly: true, sameSite: 'none'});
-        
-        return res.status(200).json({ok: true, tokens: tokens});
-    });
-    
+    const {id, name, email} = req.user;
+    const user = {
+        id,
+        name, 
+        email
+    }
+
+    const tokens = generateTokens(user);
+    return res.status(200).json({ok:true, tokens: tokens});
 };
 
 module.exports = {

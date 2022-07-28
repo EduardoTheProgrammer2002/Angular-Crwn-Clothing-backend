@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const app = express();
 
-const corOptions = {credential: true, origin: process.env.url || "*"};
+const corOptions = {credential: true, origin: process.env.url || "http://localhost:4200"};
 
 app.use(cors(corOptions));
 app.use(cookieParser());
