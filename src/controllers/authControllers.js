@@ -35,7 +35,6 @@ const signUserUp = async (req, res) => {
                     return res.status(200).json({ok: false, error: err.message});
                 }
                 const tokens = generateTokens(result.rows);
-                res.cookie('refresh_token', tokens.refreshToken, {httpOnly: true, sameSite: 'none'});
                 return res.status(200).json({ok: true, msg: "Congrats! Your account's been created", tokens});
             }
         );
@@ -64,12 +63,18 @@ const signUserIn = async (req, res) => {
         //user passed all the validations, it's time to generate tokens
         const tokens = generateTokens(user);
 
-        //store the refresh_token in the cookies to usit to refresh the tokens.
-        res.cookie('refresh_token', tokens.refreshToken, {httpOnly: true, sameSite: 'none'});
         return res.status(200).json({ok: true, tokens: tokens});
 
     } catch (error) {
         return res.status(200).json({ok: false, error: error.message})
+    }
+};
+
+const signOut = async (req, res) => {
+    try {
+        res.status(200).json({ok: true, msg: 'Now you are logged out'});
+    } catch (error) {
+        res.status(200).json({ok: false, error: error.message});
     }
 };
 
@@ -88,5 +93,6 @@ const refreshAuth = (req, res) => {
 module.exports = {
     signUserUp,
     signUserIn,
-    refreshAuth
+    refreshAuth,
+    signOut
 };
