@@ -1,22 +1,14 @@
 const express = require('express');
+const { storeItem, getUserAuthenticated } = require('../controllers/userControllers');
 const { pool } = require('../db');
 const { authenticateToken } = require('../middlewares/authorization');
+const { getItemByUniqueConstraint } = require('../utils/itemHelpers');
 
 const router = express.Router();
 
-router.get("/user", authenticateToken, async (req, res) => {
-    const {id, name, email} = req.user;
+router.get("/user", authenticateToken, getUserAuthenticated);
 
-    //create a user.
-    const user = {
-        id,
-        name, 
-        email
-    };
-
-    return res.status(200).json({ok: true, user: user});
-})
-
+router.post("/storeItem", authenticateToken, storeItem);
 
 
 
