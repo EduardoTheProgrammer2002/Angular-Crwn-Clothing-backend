@@ -7,11 +7,8 @@ const getItemByUniqueConstraint = async(unique) => {
     );
 
     if (!(!!item.rowCount)) {
-        console.log('itme not found')
         return null
     }
-
-    console.log('item found');
     return item.rows;
 };
 

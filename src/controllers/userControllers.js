@@ -1,4 +1,5 @@
 const { pool } = require("../db");
+const { getItemByUniqueConstraint } = require("../utils/itemHelpers");
 
 const getUserAuthenticated = (req, res) => {
     const {id, name, email} = req.user;
@@ -16,13 +17,15 @@ const getUserAuthenticated = (req, res) => {
 
 //store the item selected by the user
 const storeItem = async (req, res) => {
-    const {name, imageUrl, quantity, price, userId} = req.body;
+    const {name, imgUrl, price} = req.body;
+    const userId = req.user.id;
+    const defaultQuantity = 1;
     
     const item = await getItemByUniqueConstraint(name);
     
     //if the item is found, we want to update the quantity of the item
     if (item) {
-        const newQuantity = quantity + Number(item[0]['quantity']);
+        const newQuantity = 1 + Number(item[0]['quantity']);
         return await pool.query(
             `UPDATE items SET quantity = $1 WHERE description = $2`, 
             [newQuantity, name], 
@@ -40,7 +43,7 @@ const storeItem = async (req, res) => {
     try {
         return await pool.query(
             `INSERT INTO items (imgurl, description, quantity, price, userid) VALUES ($1, $2, $3, $4, $5)`,
-            [imageUrl, name, quantity, price, userId],
+            [imgUrl, name, defaultQuantity, price, userId],
             (err, result) => {
                 if (err) {
                     return res.status(200).json({ok: false, error: err.message})
@@ -54,7 +57,33 @@ const storeItem = async (req, res) => {
     }
 };
 
+const getItem = async (req, res) => {
+    //get the user authenticated to use the id
+    const user = req.user;
+
+    try {
+        //try to get the item form the database.
+        const items = await pool.query(
+            `SELECT * FROM items WHERE userid = $1`,
+            [user.id]
+        );
+        
+        //if this is true, the user items variable is empty what means that the user haven't selected any items yet.
+        if (items.rowCount === 0) {
+           return  res.status(200).json({ok: false, items: null});    
+        } 
+        
+        //send the items to the client side
+        return res.status(200).json({ok: true, items: items.rows});
+
+    } catch (error) { // an error has come up, just send it to the client side.
+        return res.status(200).json({ok: false, error: error.msg, items: null})
+    }
+};
+
+
 module.exports = {
     storeItem,
-    getUserAuthenticated
+    getUserAuthenticated,
+    getItem
 }
