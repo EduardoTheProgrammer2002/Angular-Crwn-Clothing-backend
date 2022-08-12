@@ -64,7 +64,7 @@ const getItem = async (req, res) => {
     try {
         //try to get the item form the database.
         const items = await pool.query(
-            `SELECT * FROM items WHERE userid = $1`,
+            `SELECT imgurl,description,quantity,price FROM items WHERE userid = $1`,
             [user.id]
         );
         
