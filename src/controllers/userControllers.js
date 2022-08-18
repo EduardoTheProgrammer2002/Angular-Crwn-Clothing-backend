@@ -1,5 +1,5 @@
 const { pool } = require("../db");
-const { getItemByUniqueConstraint } = require("../utils/itemHelpers");
+const { getSingleItem, getItemQuantity } = require("../utils/itemHelpers");
 
 const getUserAuthenticated = (req, res) => {
     const {id, name, email} = req.user;
@@ -21,7 +21,8 @@ const storeItem = async (req, res) => {
     const userId = req.user.id;
     const defaultQuantity = 1;
     
-    const item = await getItemByUniqueConstraint(name);
+    //get a single item
+    const item = await getSingleItem(name, userId);
     
     //if the item is found, we want to update the quantity of the item
     if (item) {
@@ -70,14 +71,17 @@ const getItem = async (req, res) => {
         
         //if this is true, the user items variable is empty what means that the user haven't selected any items yet.
         if (items.rowCount === 0) {
-           return  res.status(200).json({ok: false, items: null});    
+           return  res.status(200).json({ok: false, items: null, totalQuantity: 0});    
         } 
         
+        //get the total quantity of items to send it to the frontend
+        const itemsQuantity = getItemQuantity(items.rows);
+
         //send the items to the client side
-        return res.status(200).json({ok: true, items: items.rows});
+        return res.status(200).json({ok: true, items: items.rows, itemsQuantity: itemsQuantity});
 
     } catch (error) { // an error has come up, just send it to the client side.
-        return res.status(200).json({ok: false, error: error.msg, items: null})
+        return res.status(200).json({ok: false, error: error.msg, items: null, itemsQuantity: 0});
     }
 };
 
