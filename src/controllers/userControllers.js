@@ -14,6 +14,29 @@ const getUserAuthenticated = (req, res) => {
     return res.status(200).json({ok: true, user: user});
 }
 
+//this deletes all the items amount for a specific item
+const deleteItem = async (req, res) => {
+    const {description} = req.body;
+    const userId = req.user.id;
+
+    //get a single item
+    const item = await getSingleItem(description, userId);
+
+    if(!item) {
+        return res.status(404).json({ok: false, err: "Item not found"});
+    }
+
+    return await pool.query(
+        `DELETE FROM items WHERE description=$1 AND userId=$2`,
+        [description, userId],
+        (err, result) => {
+            if (err) {
+                return res.status(200).json({ok: false, err: err.message});
+            }
+            return res.status(200).json({ok: true, msg: "Item deleted successfully!"})
+        }
+    );
+};
 
 //store the item selected by the user
 const storeItem = async (req, res) => {
@@ -89,5 +112,6 @@ const getItem = async (req, res) => {
 module.exports = {
     storeItem,
     getUserAuthenticated,
-    getItem
+    getItem,
+    deleteItem
 }
