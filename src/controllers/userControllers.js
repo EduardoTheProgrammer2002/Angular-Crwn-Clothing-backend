@@ -38,6 +38,26 @@ const deleteItem = async (req, res) => {
     );
 };
 
+//update a single item quantity
+const updateItemQuantity =  async (req, res) => {
+    const userId = req.user.id;
+    const {quantity, item} = req.body;
+    
+    return await pool.query(
+        `UPDATE items SET quantity = $1 WHERE description = $2 AND userID = $3`,
+        [quantity, item.description, userId],
+        (err, result) => {
+            if (err) {
+                res.status(200).json({ok: false, err: err.message});
+                return
+            }
+
+            res.status(200).json({ok: true, msg: "Item quantity UPDATED"});
+            return
+        }
+    );
+};
+
 //store the item selected by the user
 const storeItem = async (req, res) => {
     const {name, imgUrl, price} = req.body;
@@ -113,5 +133,6 @@ module.exports = {
     storeItem,
     getUserAuthenticated,
     getItem,
-    deleteItem
+    deleteItem,
+    updateItemQuantity
 }
