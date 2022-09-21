@@ -38,6 +38,27 @@ const deleteItem = async (req, res) => {
     );
 };
 
+//This makes an operation on an item's quantity, the operation could be an INCREASE(adding) or DECREASE(substraction) operation
+const operateOnItemQuantity = async (req, res) => {
+    const userId = req.user.id;
+    const {operation, item} = req.body;
+    const updatedQuantity = operation === 'increase'? parseInt(item.quantity) + 1 : parseInt(item.quantity) - 1;
+
+    return await pool.query(
+        `UPDATE items SET quantity = $1 WHERE description = $2 AND userID = $3`,
+        [updatedQuantity, item.description, userId],
+        (err, result) => {
+            if (err) {
+                res.status(200).json({ok: false, err: err.message});
+                return
+            }
+
+            res.status(200).json({ok: true, msg: "Item quantity UPDATED"});
+            return
+        }
+    );
+};
+
 //update a single item quantity
 const updateItemQuantity =  async (req, res) => {
     const userId = req.user.id;
@@ -134,5 +155,6 @@ module.exports = {
     getUserAuthenticated,
     getItem,
     deleteItem,
-    updateItemQuantity
+    updateItemQuantity,
+    operateOnItemQuantity
 }
