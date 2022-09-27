@@ -38,6 +38,26 @@ const deleteItem = async (req, res) => {
     );
 };
 
+//this endpoint deletes all items at once
+const deleteAllItems = async (req, res) => {
+    const userId = req.user.id;
+
+    if(!userId) {
+        return res.status(404).json({ok: false, err: "User not found"});
+    }
+
+    return await pool.query(
+        `DELETE FROM items WHERE userId=$1`,
+        [userId],
+        (err, result) => {
+            if (err) {
+                return res.status(200).json({ok: false, err: err.message});
+            }
+            return res.status(200).json({ok: true, msg: "Items were deleted successfully!"})
+        }
+    );
+};
+
 //This makes an operation on an item's quantity, the operation could be an INCREASE(adding) or DECREASE(substraction) operation
 const operateOnItemQuantity = async (req, res) => {
     const userId = req.user.id;
@@ -156,5 +176,6 @@ module.exports = {
     getItem,
     deleteItem,
     updateItemQuantity,
-    operateOnItemQuantity
+    operateOnItemQuantity,
+    deleteAllItems
 }
