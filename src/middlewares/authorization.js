@@ -12,13 +12,12 @@ const authenticateToken = (req, res, next) => {
         return res.status(200).json({ok: false, error: "You need to log in."});
     }
 
-    const SECRET = tokenId === 'Access' ? process.env.ACCESS_TOKEN_SECRET :  process.env.REFRESH_TOKEN_SECRET
+    const SECRET = tokenId === 'Access' ? process.env.ACCESS_TOKEN_SECRET :  process.env.REFRESH_TOKEN_SECRET;
 
     jwt.verify(token, SECRET, (err, user) => {
         if (err) {
             return res.status(200).json({ok: false, err: err.message});
         }
-
         req.user = user;
         next();
     })

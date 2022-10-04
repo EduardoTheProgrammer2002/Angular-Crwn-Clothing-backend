@@ -34,7 +34,8 @@ const signUserUp = async (req, res) => {
                 if (err) {
                     return res.status(200).json({ok: false, error: err.message});
                 }
-                const tokens = generateTokens(result.rows);
+
+                const tokens = generateTokens(result.rows[0]);
                 return res.status(200).json({ok: true, msg: "Congrats! Your account's been created", tokens});
             }
         );
@@ -85,9 +86,10 @@ const refreshAuth = (req, res) => {
         name, 
         email
     }
+    // console.log(user);
 
     const tokens = generateTokens(user);
-    return res.status(200).json({ok:true, tokens: tokens});
+    return res.status(200).json({ok:true, tokens: tokens, user: user});
 };
 
 module.exports = {
